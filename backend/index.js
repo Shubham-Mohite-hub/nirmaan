@@ -1,13 +1,43 @@
-import mongoose from 'mongoose';
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import userRoute from "./routes/user.route.js";
+import messageRoute from "./routes/message.route.js";
+import path from "path";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import { app, server } from "./SocketIo/server.js";
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/your-database', { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log('MongoDB connected');
-  } catch (error) {
-    console.error('MongoDB connection failed', error);
-    process.exit(1);
-  }
-};
 
-export default connectDB;
+dotenv.config();
+//middleware
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
+
+// ++++++++++++++++
+const db = process.env.PORT || 3001;
+const URI = process.env.MONGODB_URI;
+
+try {
+  mongoose.connect(URI);
+  console.log("connected to mongodb");
+} catch (error) {
+  console.log("Error:", error);
+}
+// app.use("api/auth",authRoutes)
+app.use("/api/user", userRoute);
+app.use("/api/message", messageRoute);
+
+if (process.env.NODE_ENV === "production") {
+  const dirPath = path.resolve();
+  app.use(express.static("./frontend/dist"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(dirPath, "./frontend/dist", "index.html"));
+  });
+}
+
+server.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`);
+});
