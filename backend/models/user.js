@@ -14,13 +14,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  confirconfirmPassword: {
-    type: String,
-  },
   gender: {
     type: String,
-    enum: ['male', 'female', 'other'], // You can restrict the gender values to these options or leave it flexible
-    required: true, // You can make this optional if needed
+    enum: ['male', 'female', 'other'], // You can restrict the gender values to these options
+    required: true,
   }
 });
 
